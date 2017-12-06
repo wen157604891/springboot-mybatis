@@ -57,6 +57,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
         logger.info("============= SpringBoot Start Success =============");
         System.out.println("设置分支");
+        
     }
     
 }
