@@ -1,5 +1,8 @@
 package com.afw.springboot.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.afw.springboot.config.RedisUtils;
 import com.afw.springboot.domain.entity.User;
 import com.afw.springboot.service.UserService;
 
@@ -18,6 +22,8 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
+	@Autowired
+	RedisUtils redisUtils;
 
 	/** 返回页面
 	 * @author wsw
@@ -29,7 +35,17 @@ public class UserController {
 	 */
 	@RequestMapping(value="findInfo",method=RequestMethod.GET)
 	public String getUserInfoById(@RequestParam("id") int id,Model model){
-		User user=userService.findUserById(id);
+		User user=(User)redisUtils.get("findInfo"+id);
+		if(user==null){
+			user=userService.findUserById(id);
+			if(user!=null){
+				redisUtils.set("findInfo"+id, user);
+			}
+		}
+		List<String> list =new ArrayList<String>();
+		list.add("niu");
+		list.add("niu1");
+		redisUtils.setList("bootList", list);
 		model.addAttribute("user", user);
 		return "page/hello";
 	}
